@@ -3,14 +3,11 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
 /// @title IdentityRegistry — ERC-8004 inspired on-chain agent identity
 /// @dev ERC-721 where each token represents a unique agent identity
 contract IdentityRegistry is ERC721, Ownable {
-    using Counters for Counters.Counter;
-
-    Counters.Counter private _tokenIdCounter;
+    uint256 private _nextTokenId;
 
     struct AgentIdentity {
         string agentURI;    // IPFS/HTTPS URI to agent metadata JSON
@@ -34,7 +31,6 @@ contract IdentityRegistry is ERC721, Ownable {
     error AlreadyRegistered();
     error NotAgentOwner();
     error InvalidURI();
-    error AgentNotActive();
 
     constructor() ERC721("AgentIdentity", "AID") Ownable(msg.sender) {}
 
@@ -43,8 +39,8 @@ contract IdentityRegistry is ERC721, Ownable {
         if (walletToAgent[msg.sender] != 0) revert AlreadyRegistered();
         if (bytes(agentURI).length == 0) revert InvalidURI();
 
-        _tokenIdCounter.increment();
-        tokenId = _tokenIdCounter.current();
+        _nextTokenId++;
+        tokenId = _nextTokenId;
 
         _safeMint(msg.sender, tokenId);
 
@@ -103,6 +99,6 @@ contract IdentityRegistry is ERC721, Ownable {
     }
 
     function totalAgents() external view returns (uint256) {
-        return _tokenIdCounter.current();
+        return _nextTokenId;
     }
 }

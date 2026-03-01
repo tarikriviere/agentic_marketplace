@@ -8,13 +8,10 @@ import "../src/ValidationRegistry.sol";
 
 contract DeployScript is Script {
     function run() external {
-        uint256 deployerKey = vm.envUint("DEPLOYER_KEY");
-        address deployer = vm.addr(deployerKey);
-
-        console.log("Deploying from:", deployer);
+        console.log("Deploying from:", msg.sender);
         console.log("Chain ID:", block.chainid);
 
-        vm.startBroadcast(deployerKey);
+        vm.startBroadcast();
 
         // Deploy IdentityRegistry first (others depend on it)
         IdentityRegistry identity = new IdentityRegistry();
